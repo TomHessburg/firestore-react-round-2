@@ -1,26 +1,71 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import { signInWithGoogle, auth, firestore } from "./firebase";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    user: null
+  };
+
+  unsubsribeFromAuth = null;
+
+  componentDidMount = () => {
+    this.unsubsribeFromAuth = auth.onAuthStateChanged(async user => {
+      if (user) {
+        const { uid, email, displayName, photoURL } = user;
+        let userRef = firestore.collection("users").doc(uid);
+        let isUser = await userRef.get();
+
+        if (isUser.exists) {
+          this.setState({
+            user: { ...isUser.data() }
+          });
+        } else {
+          let newUser = await userRef.set({
+            uid,
+            email,
+            displayName,
+            photoURL
+          });
+          this.setState({
+            user: { ...newUser.data() }
+          });
+        }
+      }
+    });
+  };
+
+  componentWillUnmount = () => {
+    this.unsubsribeFromAuth();
+  };
+
+  render() {
+    console.log(this.state);
+    return (
+      <div className="App">
+        <h1>hi</h1>
+        {!this.state.user ? (
+          <button onClick={signInWithGoogle}>sign in</button>
+        ) : (
+          <div>
+            <button
+              onClick={() => {
+                auth.signOut();
+                this.setState({
+                  user: false
+                });
+              }}
+            >
+              sign out
+            </button>
+            <div>
+              <h1>Currently signed in as: {this.state.user.displayName}</h1>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 }
 
 export default App;
