@@ -4,7 +4,8 @@ import { signInWithGoogle, auth, firestore } from "./firebase";
 
 class App extends React.Component {
   state = {
-    user: null
+    user: null,
+    accountType: "basic"
   };
 
   unsubsribeFromAuth = null;
@@ -18,17 +19,23 @@ class App extends React.Component {
 
         if (isUser.exists) {
           this.setState({
-            user: { ...isUser.data() }
+            user: { ...isUser.data() },
+            accountType: ""
           });
         } else {
-          let newUser = await userRef.set({
+          await userRef.set({
             uid,
             email,
             displayName,
-            photoURL
+            photoURL,
+            accountType: this.state.accountType
           });
+
+          let userReturn = await userRef.get();
+
           this.setState({
-            user: { ...newUser.data() }
+            user: { ...userReturn.data() },
+            accountType: ""
           });
         }
       }
@@ -45,7 +52,19 @@ class App extends React.Component {
       <div className="App">
         <h1>hi</h1>
         {!this.state.user ? (
-          <button onClick={signInWithGoogle}>sign in</button>
+          <div>
+            <button onClick={signInWithGoogle}>sign in</button>
+            <br />
+            <input
+              type="text"
+              value={this.state.accountType}
+              onChange={e => {
+                this.setState({
+                  accountType: e.target.value
+                });
+              }}
+            />
+          </div>
         ) : (
           <div>
             <button
