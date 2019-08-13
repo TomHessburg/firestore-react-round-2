@@ -1,5 +1,7 @@
 import React from "react";
 import "./App.css";
+import VideoElement from "./components/VideoElement";
+
 import { signInWithGoogle, auth, firestore } from "./firebase";
 
 class App extends React.Component {
@@ -79,6 +81,7 @@ class App extends React.Component {
             </button>
             <div>
               <h1>Currently signed in as: {this.state.user.displayName}</h1>
+              <VideoElement user={this.state.user} />
             </div>
           </div>
         )}
