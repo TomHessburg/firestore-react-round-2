@@ -7,8 +7,6 @@ import {
   createSession
 } from "opentok-react";
 
-// const secret = "96a8b7efaea5caf27f436b74bf5a9d4ca5d1586b";
-
 export default class VideoElement extends React.Component {
   constructor(props) {
     super(props);
