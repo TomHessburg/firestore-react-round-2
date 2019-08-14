@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import VideoElement from "./components/VideoElement";
+import CalendarElement from "./components/CalendarElement";
 
 import { signInWithGoogle, auth, firestore } from "./firebase";
 
@@ -82,6 +83,7 @@ class App extends React.Component {
             <div>
               <h1>Currently signed in as: {this.state.user.displayName}</h1>
               <VideoElement user={this.state.user} />
+              <CalendarElement />
             </div>
           </div>
         )}
